@@ -1,0 +1,40 @@
+@CHARSET "UTF-8";
+
+.abframe {
+	min-width: 200px;
+	max-width: 800px;
+}
+
+.abwallpaper {
+	background: url("/pix/curved-wood-wallpaper.jpg");
+	background-size: 100%;
+	background-repeat: no-repeat;
+	position:relative;
+}
+
+.abboard {
+	width: 766px;
+	height: 300px;
+}
+
+.abteacher {
+	bottom: 0;
+	position: absolute;
+}
+
+.abteacher_r {
+	right: 0;
+}
+
+.abteacher_l {
+	left: 0;
+}
+
+.abteacher_c {
+	text-align: center;
+	width: 100%;
+}
+
+.abfooter {
+	text-align: right;
+}
