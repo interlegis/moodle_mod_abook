@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/edit_form.php');
 require_once($CFG->libdir.'/filelib.php');
 
 /**
@@ -44,20 +45,13 @@ function abook_preload_slides($abook) {
         return array();
     }
 
-    $prev = null;
-    $prevsub = null;
-
-    $hidesub = true;
-    $parent = null;
     $pagenum = 0; // slide sort
-    $i = 0;       // main slide num
+    
     foreach ($slides as $id => $sl) {
-        $oldsl = clone($sl);
         $pagenum++;
-        $sl->pagenum = $pagenum;
-
-        if ($oldsl->pagenum != $sl->pagenum) {
-            // update only if something changed
+        if ($pagenum != $sl->pagenum) {
+        	// update only if pagenum changed
+        	$sl->pagenum = $pagenum;
             $DB->update_record('abook_slide', $sl);
         }
         $slides[$id] = $sl;
@@ -196,14 +190,196 @@ function get_pix_url($context, $slide, $filearea) {
 	if ($files = $fs->get_area_files($context->id, 'mod_abook', $filearea, $slide->id, "timemodified", false)) {
 		foreach ($files as $file) {
 			$url = moodle_url::make_pluginfile_url($context->id, 'mod_abook', $filearea, $slide->id, $file->get_filepath(), $file->get_filename());
-			return $url;
+			return $url->out();
 		}
 	}
 	
 	if (in_array($filearea, array('wallpaper', 'footerpix', 'teacherpix'))) {
-		return $OUTPUT->pix_url($filearea, 'mod_abook');
+		return $OUTPUT->pix_url($filearea, 'mod_abook')->out();
 	}
 	return ''; # No default
+}
+
+/**
+ * Prepare slide form
+ * 
+ * @param stdClass $slide - by reference
+ * @param stdClass $context
+ * @param array $editoroptions
+ * @param array $pixoptions
+ * @return abook_slide_edit_form $mform
+ */
+
+function prepare_slide_form(&$slide, $context, $editoroptions, $pixoptions, $action=null) {
+	$slide = file_prepare_standard_editor($slide, 'content' , $editoroptions, $context, 'mod_abook', 'content' , $slide->id);
+	$slide = file_prepare_standard_editor($slide, 'content1', $editoroptions, $context, 'mod_abook', 'content1', $slide->id);
+	$slide = file_prepare_standard_editor($slide, 'content2', $editoroptions, $context, 'mod_abook', 'content2', $slide->id);
+	$slide = file_prepare_standard_editor($slide, 'content3', $editoroptions, $context, 'mod_abook', 'content3', $slide->id);
+	
+	$slide = file_prepare_standard_filemanager($slide, 'wallpaper' , $pixoptions, $context, 'mod_abook', 'wallpaper' , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'boardpix'  , $pixoptions, $context, 'mod_abook', 'boardpix'  , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'boardpix1' , $pixoptions, $context, 'mod_abook', 'boardpix1' , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'boardpix2' , $pixoptions, $context, 'mod_abook', 'boardpix2' , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'boardpix3' , $pixoptions, $context, 'mod_abook', 'boardpix3' , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'footerpix' , $pixoptions, $context, 'mod_abook', 'footerpix' , $slide->id);
+	$slide = file_prepare_standard_filemanager($slide, 'teacherpix', $pixoptions, $context, 'mod_abook', 'teacherpix', $slide->id);
+	
+	return new abook_slide_edit_form($action, array('slide'=>$slide, 'options'=>$editoroptions, 'pixoptions'=>$pixoptions));
+}
+
+/**
+ * Process slide form
+ * 
+ * @param abook_slide_edit_form $mform
+ * @param stdClass $slide - by reference
+ * @param stdClass $abook
+ * @param stdClass $context
+ * @param array $editoroptions
+ * @param array $pixoptions
+ * @return bool indicating if slide has been correctly saved
+ */
+
+function process_slide_form($mform, &$slide, $abook, $context, $editoroptions, $pixoptions) {
+	global $DB;
+	// If data submitted, then process and store.
+	if ($mform->is_cancelled()) {
+		return false;
+	} else if ($data = $mform->get_data()) {
+		if (!$data->id) {
+			// adding new slide
+			$data->abookid        = $abook->id;
+			$data->hidden         = 0;
+			$data->timecreated    = time();
+			$data->timemodified   = time();
+			$data->importsrc      = '';
+			$data->content        = '';          // updated later
+			$data->content1       = '';          // updated later
+			$data->content2       = '';          // updated later
+			$data->content3       = '';          // updated later
+			$data->contentformat  = FORMAT_HTML; // updated later
+			$data->content1format = FORMAT_HTML; // updated later
+			$data->content2format = FORMAT_HTML; // updated later
+			$data->content3format = FORMAT_HTML; // updated later
+	
+			// make room for new page
+			$sql = "UPDATE {abook_slide}
+                   SET pagenum = pagenum + 1
+                 WHERE abookid = ? AND pagenum >= ?";
+			$DB->execute($sql, array($abook->id, $data->pagenum));
+	
+			$data->id = $DB->insert_record('abook_slide', $data);
+		}
+	
+		// store the files
+		$data->timemodified = time();
+		$data = file_postupdate_standard_editor($data, 'content' , $editoroptions, $context, 'mod_abook', 'content' , $data->id);
+		$data = file_postupdate_standard_editor($data, 'content1', $editoroptions, $context, 'mod_abook', 'content1', $data->id);
+		$data = file_postupdate_standard_editor($data, 'content2', $editoroptions, $context, 'mod_abook', 'content2', $data->id);
+		$data = file_postupdate_standard_editor($data, 'content3', $editoroptions, $context, 'mod_abook', 'content3', $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'wallpaper' , $pixoptions, $context, 'mod_abook', 'wallpaper' , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'boardpix'  , $pixoptions, $context, 'mod_abook', 'boardpix'  , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'boardpix1' , $pixoptions, $context, 'mod_abook', 'boardpix1' , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'boardpix2' , $pixoptions, $context, 'mod_abook', 'boardpix2' , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'boardpix3' , $pixoptions, $context, 'mod_abook', 'boardpix3' , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'footerpix' , $pixoptions, $context, 'mod_abook', 'footerpix' , $data->id);
+		$data = file_postupdate_standard_filemanager($data, 'teacherpix', $pixoptions, $context, 'mod_abook', 'teacherpix', $data->id);
+	
+		$DB->update_record('abook_slide', $data);
+		$DB->set_field('abook', 'revision', $abook->revision+1, array('id'=>$abook->id));
+		$slide = $DB->get_record('abook_slide', array('id' => $data->id));
+	
+		\mod_abook\event\slide_updated::create_from_slide($abook, $context, $slide)->trigger();
+	
+		abook_preload_slides($abook); // fix structure
+		return true;
+	}
+	
+	return false;
+}
+
+/**
+ * Convert slide to array of data
+ * @param stdClass $abook
+ * @param stdClass $slide
+ * @param stdClass $context
+ * @param stdClass $cm
+ * @param array $fmtoptions
+ * @return array $data
+ */
+
+function slide_to_array($abook, $slide, $context, $fmtoptions, $cm, $edit) {
+	global $OUTPUT;
+	// prepare slide navigation icons
+	$slides = abook_preload_slides($abook);
+	$previd = null;
+	$nextid = null;
+	$last = null;
+	foreach ($slides as $sl) {
+		if (!$edit and $sl->hidden) {
+			continue;
+		}
+		if ($last == $slide->id) {
+			$nextid = $sl->id;
+			break;
+		}
+		if ($sl->id != $slide->id) {
+			$previd = $sl->id;
+		}
+		$last = $sl->id;
+	}
+	
+	$navprevicon = right_to_left() ? 'right' : 'left';
+	$navnexticon = right_to_left() ? 'left' : 'right';
+	
+	$slnavigation = '';
+	if ($previd) {
+		$slnavigation .= '<a id="prevbutton" title="'.get_string('navprev', 'abook').'" href="view.php?id='.$cm->id.
+		'&amp;slideid='.$previd.'" class="btn btn-default"><img src="'.$OUTPUT->pix_url($navprevicon, 'mod_abook').'" class="icon" alt="" /></a>';
+	} else {
+		$slnavigation .= '<button class="btn btn-default" disabled="disabled"><img src="'.$OUTPUT->pix_url($navprevicon, 'mod_abook').'" class="icon" alt="" /></button>';
+	}
+	
+	if ($nextid) {
+		$slnavigation .= '<a id="nextbutton" title="'.get_string('navnext', 'abook').'" href="view.php?id='.$cm->id.
+		'&amp;slideid='.$nextid.'" class="btn btn-default"><img src="'.$OUTPUT->pix_url($navnexticon, 'mod_abook').'" class="icon" alt="" /></a>';
+	} else {
+		$slnavigation .= '<button class="btn btn-default" disabled="disabled"><img src="'.$OUTPUT->pix_url($navnexticon, 'mod_abook').'" class="icon" alt="" /></button>';
+		// we are cheating a bit here, viewing the last page means user has viewed the whole abook
+		$completion = new completion_info($course);
+		$completion->set_module_viewed($cm);
+	}
+	
+	$data = array(
+			'pagetitle'         => $abook->name . ": " . $slide->title,
+			'navigation'        => $slnavigation,
+			'slidetype'         => $slide->slidetype,
+			'title'             => abook_get_slide_title($slide->id, $slides, $abook, $context),
+			'wallpaper'         => get_pix_url($context, $slide, 'wallpaper'),
+			'frameheight'       => $slide->frameheight,
+			'content'           => format_text(file_rewrite_pluginfile_urls($slide->content , 'pluginfile.php', $context->id, 'mod_abook', 'content' , $slide->id), $slide->contentformat, $fmtoptions),
+			'content1'          => format_text(file_rewrite_pluginfile_urls($slide->content1, 'pluginfile.php', $context->id, 'mod_abook', 'content1', $slide->id), $slide->contentformat, $fmtoptions),
+			'content2'          => format_text(file_rewrite_pluginfile_urls($slide->content2, 'pluginfile.php', $context->id, 'mod_abook', 'content2', $slide->id), $slide->contentformat, $fmtoptions),
+			'content3'          => format_text(file_rewrite_pluginfile_urls($slide->content3, 'pluginfile.php', $context->id, 'mod_abook', 'content3', $slide->id), $slide->contentformat, $fmtoptions),
+			'contentanimation'  => "{$slide->contentanimation}" .(($slide->contentanimation ) ? " animated" : ""),
+			'contentanimation1' => "{$slide->contentanimation1}".(($slide->contentanimation1) ? " animated" : ""),
+			'contentanimation2' => "{$slide->contentanimation2}".(($slide->contentanimation2) ? " animated" : ""),
+			'contentanimation3' => "{$slide->contentanimation3}".(($slide->contentanimation3) ? " animated" : ""),
+			'boardpix'          => get_pix_url($context, $slide, 'boardpix'),
+			'boardpix1'         => get_pix_url($context, $slide, 'boardpix1'),
+			'boardpix2'         => get_pix_url($context, $slide, 'boardpix2'),
+			'boardpix3'         => get_pix_url($context, $slide, 'boardpix3'),
+			'boardheight'       => $slide->boardheight,
+			'boardheight1'      => $slide->boardheight1,
+			'boardheight2'      => $slide->boardheight2,
+			'boardheight3'      => $slide->boardheight3,
+			'footerpix'         => get_pix_url($context, $slide, 'footerpix'),
+			'footerpos'         => "abpos_{$slide->footerpos}",
+			'footeranimation'   => "{$slide->footeranimation}".(($slide->footeranimation) ? " animated" : ""),
+			'teacherpix'        => get_pix_url($context, $slide, 'teacherpix'),
+			'teacherpos'        => "abpos_{$slide->teacherpos}",
+			'teacheranimation'  => "{$slide->teacheranimation}".(($slide->teacheranimation) ? " animated" : "")
+	);
+	return $data;
 }
 
 /**

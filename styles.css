@@ -41,7 +41,10 @@
 	text-align: right;
 }
 
-
+.abbtn-edit {
+	border: 1px solid #b4b4b7;
+	cursor: pointer;
+}
 
 
 

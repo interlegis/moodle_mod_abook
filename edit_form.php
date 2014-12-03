@@ -43,15 +43,13 @@ class abook_slide_edit_form extends moodleform {
         $slide      = $this->_customdata['slide'];
         $options    = $this->_customdata['options'];
         $pixoptions = $this->_customdata['pixoptions'];
-
+        
         $mform = $this->_form;
 
-        if (!empty($slide->id)) {
-            $mform->addElement('header', 'general', get_string('editingslide', 'mod_abook'));
-        } else {
-            $mform->addElement('header', 'general', get_string('addafter', 'mod_abook'));
-        }
-
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'titlepanelsettings', get_string('general_settings', 'mod_abook'));
+        $mform->setExpanded('titlepanelsettings');
+        	
         $mform->addElement('select', 'slidetype', get_string('slidetype', 'mod_abook'), slide_types());
         $mform->setType('slidetype', PARAM_RAW);
         $mform->addRule('slidetype', get_string('required'), 'required', null, 'client');
@@ -67,6 +65,10 @@ class abook_slide_edit_form extends moodleform {
         $mform->setType('title', PARAM_RAW);
         $mform->addRule('title', null, 'required', null, 'client');
 
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'contentsettings', get_string('content_settings', 'mod_abook'));
+        $mform->setExpanded('contentsettings');
+
         $mform->addElement('editor', 'content_editor', get_string('content', 'mod_abook'), null, $options);
         $mform->setType('content_editor', PARAM_RAW);
 
@@ -80,6 +82,10 @@ class abook_slide_edit_form extends moodleform {
         $mform->setType('boardheight', PARAM_RAW);
         $mform->addHelpButton('boardheight', 'boardheight', 'mod_abook');
         
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'content1settings', get_string('content1_settings', 'mod_abook'));
+        $mform->setExpanded('content1settings');
+
         $mform->addElement('editor', 'content1_editor', get_string('content1', 'mod_abook'), null, $options);
         $mform->setType('content1_editor', PARAM_RAW);
         
@@ -92,6 +98,10 @@ class abook_slide_edit_form extends moodleform {
         $mform->addElement('text', 'boardheight1', get_string('boardheight1', 'mod_abook'), array('size'=>'30'));
         $mform->setType('boardheight1', PARAM_RAW);
         $mform->addHelpButton('boardheight1', 'boardheight1', 'mod_abook');
+
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'content2settings', get_string('content2_settings', 'mod_abook'));
+        $mform->setExpanded('content2settings');
 
         $mform->addElement('editor', 'content2_editor', get_string('content2', 'mod_abook'), null, $options);
         $mform->setType('content2_editor', PARAM_RAW);
@@ -106,6 +116,10 @@ class abook_slide_edit_form extends moodleform {
         $mform->setType('boardheight2', PARAM_RAW);
         $mform->addHelpButton('boardheight2', 'boardheight2', 'mod_abook');
         
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'content3settings', get_string('content3_settings', 'mod_abook'));
+        $mform->setExpanded('content3settings');
+
         $mform->addElement('editor', 'content3_editor', get_string('content3', 'mod_abook'), null, $options);
         $mform->setType('content3_editor', PARAM_RAW);
 
@@ -118,7 +132,11 @@ class abook_slide_edit_form extends moodleform {
         $mform->addElement('text', 'boardheight3', get_string('boardheight3', 'mod_abook'), array('size'=>'30'));
         $mform->setType('boardheight3', PARAM_RAW);
         $mform->addHelpButton('boardheight3', 'boardheight3', 'mod_abook');
-        
+
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'floorpanelsettings', get_string('footer_settings', 'mod_abook'));
+        $mform->setExpanded('floorpanelsettings');
+
         $mform->addElement('filemanager', 'footerpix_filemanager', get_string('footerpix', 'mod_abook'), null, $pixoptions);
 		$mform->addHelpButton('footerpix_filemanager', 'footerpix', 'mod_abook');
 
@@ -128,6 +146,10 @@ class abook_slide_edit_form extends moodleform {
 
 		$mform->addElement('select', 'footeranimation', get_string('footeranimation', 'mod_abook'), $anmtopts);
 		$mform->setType('footeranimation', PARAM_RAW);
+
+        // ------------------------------------------------------------------------------------------------------------
+        $mform->addElement('header', 'teacherpanelsettings', get_string('teacher_settings', 'mod_abook'));
+        $mform->setExpanded('teacherpanelsettings');
 
 		$mform->addElement('filemanager', 'teacherpix_filemanager', get_string('teacherpix', 'mod_abook'), null, $pixoptions);
 		$mform->addHelpButton('teacherpix_filemanager', 'teacherpix', 'mod_abook');
@@ -139,6 +161,7 @@ class abook_slide_edit_form extends moodleform {
 		$mform->addElement('select', 'teacheranimation', get_string('teacheranimation', 'mod_abook'), $anmtopts);
 		$mform->setType('teacheranimation', PARAM_RAW);
 		
+		// ------------------------------------------------------------------------------------------------------------
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 

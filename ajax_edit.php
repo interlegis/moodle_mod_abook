@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Edit abook slide
+ * Ajax Edit abook slide
  *
  * @package    mod_abook
  * @copyright  2004-2011 Petr Skoda {@link http://skodak.org}
@@ -27,8 +27,8 @@ require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/edit_form.php');
 
 $cmid     = required_param('cmid', PARAM_INT);  // Book Course Module ID
-$slideid  = optional_param('id', 0, PARAM_INT); // Slide ID
-$pagenum  = optional_param('pagenum', 0, PARAM_INT);
+$slideid  = required_param('id', PARAM_INT); // Slide ID
+$pagenum  = required_param('pagenum', PARAM_INT);
 
 $cm = get_coursemodule_from_id('abook', $cmid, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
@@ -39,16 +39,7 @@ require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/abook:edit', $context);
 
-$PAGE->set_url('/mod/abook/edit.php', array('cmid'=>$cmid, 'id'=>$slideid, 'pagenum'=>$pagenum));
-$PAGE->set_pagelayout('admin'); // TODO: Something. This is a bloody hack!
-
-if ($slideid) {
-    $slide = $DB->get_record('abook_slide', array('id'=>$slideid, 'abookid'=>$abook->id), '*', MUST_EXIST);
-} else {
-    $slide = new stdClass();
-    $slide->id         = null;
-    $slide->pagenum    = $pagenum + 1;
-}
+$slide = $DB->get_record('abook_slide', array('id'=>$slideid, 'abookid'=>$abook->id), '*', MUST_EXIST);
 $slide->cmid = $cm->id;
 
 $editoroptions = array('noclean'=>true, 'subdirs'=>true, 'maxfiles'=>-1, 'maxbytes'=>0, 'context'=>$context);
@@ -58,24 +49,28 @@ $mform = prepare_slide_form($slide, $context, $editoroptions, $pixoptions);
 
 // If data submitted, then process and store.
 if ($mform->is_cancelled()) {
-    if (empty($slide->id)) {
-        redirect("view.php?id=$cm->id");
-    } else {
-        redirect("view.php?id=$cm->id&slideid=$slide->id");
-    }
+	echo "";
+	return;
 } else {
 	if (process_slide_form($mform, $slide, $abook, $context, $editoroptions, $pixoptions)) {
-		redirect("view.php?id=$cm->id&slideid=$data->id");
+		$data = slide_to_array($abook, $slide, $context, array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context), $cm, 1);
+		// =====================================================
+		// Animated book capture HTML fragment code
+		// =====================================================
+		ob_start();
+		require_once("./type/{$data['slidetype']}/render.php");
+		$html = ob_get_contents();
+		ob_end_clean();
+		// =====================================================
+		// Animated book end of display HTML code
+		// =====================================================
+		$data['html'] = $html;
+		header('Content-Type: application/json');
+		echo json_encode($data);
+		return;
 	}
 }
 
 // Otherwise fill and print the form.
-$PAGE->set_title($abook->name);
-$PAGE->set_heading($course->fullname);
-
-echo $OUTPUT->header();
-echo $OUTPUT->heading($abook->name);
-
+header('Content-Type: text/html');
 $mform->display();
-
-echo $OUTPUT->footer();

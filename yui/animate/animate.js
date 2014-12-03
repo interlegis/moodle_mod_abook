@@ -1,8 +1,11 @@
 YUI.add('moodle-mod_abook-animate', function(Y) {
   M.mod_abook = M.mod_abook || {};
   M.mod_abook.animate = {
-    init: function(slidetype) {
+    init: function(slidetype, editing) {
     	var lastrequest = '#';
+    	
+    	adjustnavbar();
+    	mod_editing()
 
     	window.onpopstate = function(e){
     	    if(e.state){
@@ -11,11 +14,12 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     	    } else {
     	    	window.location.href = e.currentTarget.location.href;
     	    }
-    	};
-    	
-    	adjustnavbar();
+    	};    	
     	
     	function adjustnavbar() {
+    		if (editing == 1) {
+    			return; // Dont use json for transitions in edit mode
+    		}
 			$("#prevbutton, #nextbutton").click(function() {
 				var url = $(this).attr("href");
 				lastrequest = url;
@@ -44,6 +48,9 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     		if ($.type(data) == "string") {
     			data = $.parseJSON(data);
     		}
+    		
+    		slideid = data.slideid;
+    		pagenum = data.pagenum;
 
     		document.title = data.pagetitle;
 
@@ -51,6 +58,7 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     			slidetype = data.slidetype;
     			$("#slidepanel").html(data.html);
     			adjustnavbar();
+    			mod_editing();
     			return;
     		}
     		
@@ -103,6 +111,34 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
 	    		.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
 	    			$("#floorpix").removeClass(data.footeranimation);
 	    	});
+	    	mod_editing();
+    	}
+    	
+    	function mod_editing() {
+    		if (editing == 1) {
+    			$("#titlepanel"  ).addClass('abbtn-edit');
+    			$("#content"     ).addClass('abbtn-edit');
+    			$("#content1"    ).addClass('abbtn-edit');
+    			$("#content2"    ).addClass('abbtn-edit');
+    			$("#content3"    ).addClass('abbtn-edit');
+    			$("#teacherpanel").addClass('abbtn-edit');
+    			$("#floorpanel"  ).addClass('abbtn-edit');
+    			$(".abbtn-edit").click(showmodal);
+    			$("#formpanel").hide();
+    			$("#formpanel>.panel-body>form>fieldset").hide();
+    			$("#formpanel>.panel-body>form").submit(function() {
+        			$("#formpanel").hide();
+    				$.post($("#formpanel>.panel-body>form").attr('action'), $("#formpanel>.panel-body>form").serializeArray(), showslide);
+    				return false;
+    			});
+    		}
+    	}
+    	
+    	function showmodal() {
+    		var formpart = '#id_'+this.id+'settings';
+    		$("#formpanel>.panel-body>form>fieldset").hide();
+    		$("#formpanel").show();
+    		$(formpart).show();
     	}
     	
     	function sethistory() {

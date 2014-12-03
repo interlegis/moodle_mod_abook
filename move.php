@@ -39,97 +39,24 @@ require_sesskey();
 $context = context_module::instance($cm->id);
 require_capability('mod/abook:edit', $context);
 
-$slide     = $DB->get_record('abook_slide', array('id'=>$slideid, 'abookid'=>$abook->id), '*', MUST_EXIST);
-$oldslides = $DB->get_records('abook_slide', array('abookid'=>$abook->id), 'pagenum', 'id, pagenum');
-
-$nothing = 0;
-
-$slides = array();
-$sls = 0;
-$sle = 0;
-$ts = 0;
-$te = 0;
-// create new ordered array and find slides to be moved
-$i = 1;
-foreach ($oldslides as $sl) {
-    $slides[$i] = $sl;
-    if ($slide->id == $sl->id) {
-        $sls = $i;
-    }
-    $i++;
-}
-
-// Find target slide(s).
-if ($up) {
-    if ($sls == 1) {
-        $nothing = 1; // Already first.
-    } else {
-        $ts = $sls - 1;
-        $te = $ts;
-    }
-} else { // Down.
-    if ($sls == count($slides)) {
-        $nothing = 1; // Already last.
-    } else {
-        $ts = $sls + 1;
-        $te = $ts;
-    }
-}
-
-// Recreated newly sorted list of slides.
-if (!$nothing) {
-    $newslides = array();
-
-    if ($up) {
-        if ($ts > 1) {
-            for ($i=1; $i<$ts; $i++) {
-                $newslides[] = $slides[$i];
-            }
-        }
-        for ($i=$sls; $i<=$sle; $i++) {
-            $newslides[$i] = $slides[$i];
-        }
-        for ($i=$ts; $i<=$te; $i++) {
-            $newslides[$i] = $slides[$i];
-        }
-        if ($sle<count($slides)) {
-            for ($i=$sle; $i<=count($slides); $i++) {
-                $newslides[$i] = $slides[$i];
-            }
-        }
-    } else {
-        if ($sls > 1) {
-            for ($i=1; $i<$sls; $i++) {
-                $newslides[] = $slides[$i];
-            }
-        }
-        for ($i=$ts; $i<=$te; $i++) {
-            $newslides[$i] = $slides[$i];
-        }
-        for ($i=$sls; $i<=$sle; $i++) {
-            $newslides[$i] = $slides[$i];
-        }
-        if ($te<count($slides)) {
-            for ($i=$te; $i<=count($slides); $i++) {
-                $newslides[$i] = $slides[$i];
-            }
-        }
-    }
-
-    // Store slides in the new order.
-    $i = 1;
-    foreach ($newslides as $sl) {
-        $sl->pagenum = $i;
-        $DB->update_record('abook_slide', $sl);
-        $sl = $DB->get_record('abook_slide', array('id' => $sl->id));
-
-        \mod_abook\event\slide_updated::create_from_slide($abook, $context, $sl)->trigger();
-
-        $i++;
-    }
-}
-
 abook_preload_slides($abook); // fix structure
+
+$slide = $DB->get_record('abook_slide', array('abookid'=>$abook->id, 'id'=>$slideid));
+
+if ($up) {
+	$swapslide = $DB->get_record('abook_slide', array('abookid'=>$abook->id, 'pagenum'=>$slide->pagenum - 1));
+} else {
+	$swapslide = $DB->get_record('abook_slide', array('abookid'=>$abook->id, 'pagenum'=>$slide->pagenum + 1));
+}
+if ($swapslide) {
+	$buffer = $swapslide->pagenum;
+	$swapslide->pagenum = $slide->pagenum;
+	$slide->pagenum = $buffer;
+	$DB->update_record('abook_slide', $slide);
+	$DB->update_record('abook_slide', $swapslide);
+}
+
+abook_preload_slides($abook); // fix structure again
 $DB->set_field('abook', 'revision', $abook->revision+1, array('id'=>$abook->id));
 
 redirect('view.php?id='.$cm->id.'&slideid='.$slide->id);

@@ -51,7 +51,9 @@ $PAGE->set_heading($course->fullname);
 // Form processing.
 if ($confirm) {  // the operation was confirmed.
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_abook', 'slide', $slide->id);
+    foreach(abook_get_file_areas() as $filearea=>$fileareaname) {
+    	$fs->delete_area_files($context->id, 'mod_abook', $filearea, $slide->id);
+    }
     $DB->delete_records('abook_slide', array('id'=>$slide->id));
 
     \mod_abook\event\slide_deleted::create_from_slide($abook, $context, $slide)->trigger();

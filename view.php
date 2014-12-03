@@ -128,82 +128,13 @@ $PAGE->set_heading($course->fullname);
 
 abook_add_fake_block($slides, $slide, $abook, $cm, $edit);
 
-// prepare slide navigation icons
-$previd = null;
-$nextid = null;
-$last = null;
-foreach ($slides as $sl) {
-    if (!$edit and $sl->hidden) {
-        continue;
-    }
-    if ($last == $slide->id) {
-        $nextid = $sl->id;
-        break;
-    }
-    if ($sl->id != $slide->id) {
-        $previd = $sl->id;
-    }
-    $last = $sl->id;
-}
-
-$navprevicon = right_to_left() ? 'right' : 'left';
-$navnexticon = right_to_left() ? 'left' : 'right';
-
-$slnavigation = '';
-if ($previd) {
-    $slnavigation .= '<a id="prevbutton" title="'.get_string('navprev', 'abook').'" href="view.php?id='.$cm->id.
-            '&amp;slideid='.$previd.'" class="btn btn-default"><img src="'.$OUTPUT->pix_url($navprevicon, 'mod_abook').'" class="icon" alt="" /></a>';
-} else {
-    $slnavigation .= '<button class="btn btn-default" disabled="disabled"><img src="'.$OUTPUT->pix_url($navprevicon, 'mod_abook').'" class="icon" alt="" /></button>';
-}
-
-if ($nextid) {
-     $slnavigation .= '<a id="nextbutton" title="'.get_string('navnext', 'abook').'" href="view.php?id='.$cm->id.
-             '&amp;slideid='.$nextid.'" class="btn btn-default"><img src="'.$OUTPUT->pix_url($navnexticon, 'mod_abook').'" class="icon" alt="" /></a>';
-} else {
-	$slnavigation .= '<button class="btn btn-default" disabled="disabled"><img src="'.$OUTPUT->pix_url($navnexticon, 'mod_abook').'" class="icon" alt="" /></button>';
-    // we are cheating a bit here, viewing the last page means user has viewed the whole abook
-    $completion = new completion_info($course);
-    $completion->set_module_viewed($cm);
-}
-
 $fmtoptions = array('noclean'=>true, 'overflowdiv'=>true, 'context'=>$context);
+$data = slide_to_array($abook, $slide, $context, $fmtoptions, $cm, $edit);
 
-$data = array(
-	'pagetitle'         => $pagetitle,
-	'navigation'        => $slnavigation,
-	'slidetype'         => $slide->slidetype,
-	'title'             => abook_get_slide_title($slide->id, $slides, $abook, $context),
-	'wallpaper'         => get_pix_url($context, $slide, 'wallpaper'),
-	'frameheight'       => $slide->frameheight,
-	'content'           => format_text(file_rewrite_pluginfile_urls($slide->content , 'pluginfile.php', $context->id, 'mod_abook', 'content' , $slide->id), $slide->contentformat, $fmtoptions),
-	'content1'          => format_text(file_rewrite_pluginfile_urls($slide->content1, 'pluginfile.php', $context->id, 'mod_abook', 'content1', $slide->id), $slide->contentformat, $fmtoptions),
-	'content2'          => format_text(file_rewrite_pluginfile_urls($slide->content2, 'pluginfile.php', $context->id, 'mod_abook', 'content2', $slide->id), $slide->contentformat, $fmtoptions),
-	'content3'          => format_text(file_rewrite_pluginfile_urls($slide->content3, 'pluginfile.php', $context->id, 'mod_abook', 'content3', $slide->id), $slide->contentformat, $fmtoptions),
-	'contentanimation'  => "{$slide->contentanimation}" .(($slide->contentanimation ) ? " animated" : ""),
-	'contentanimation1' => "{$slide->contentanimation1}".(($slide->contentanimation1) ? " animated" : ""),
-	'contentanimation2' => "{$slide->contentanimation2}".(($slide->contentanimation2) ? " animated" : ""),
-	'contentanimation3' => "{$slide->contentanimation3}".(($slide->contentanimation3) ? " animated" : ""),
-	'boardpix'          => get_pix_url($context, $slide, 'boardpix'),
-	'boardpix1'         => get_pix_url($context, $slide, 'boardpix1'),
-	'boardpix2'         => get_pix_url($context, $slide, 'boardpix2'),
-	'boardpix3'         => get_pix_url($context, $slide, 'boardpix3'),
-	'boardheight'       => $slide->boardheight,
-	'boardheight1'      => $slide->boardheight1,
-	'boardheight2'      => $slide->boardheight2,
-	'boardheight3'      => $slide->boardheight3,
-	'footerpix'         => get_pix_url($context, $slide, 'footerpix'),
-	'footerpos'         => "abpos_{$slide->footerpos}",
-	'footeranimation'   => "{$slide->footeranimation}".(($slide->footeranimation) ? " animated" : ""),
-	'teacherpix'        => get_pix_url($context, $slide, 'teacherpix'),
-	'teacherpos'        => "abpos_{$slide->teacherpos}",
-	'teacheranimation'  => "{$slide->teacheranimation}".(($slide->teacheranimation) ? " animated" : "")
-);
-
+// =====================================================
+// Animated book capture HTML fragment code
+// =====================================================
 ob_start();
-// =====================================================
-// Animated book display HTML fragment code
-// =====================================================
 require_once("./type/{$data['slidetype']}/render.php");
 $html = ob_get_contents();
 ob_end_clean();
@@ -220,11 +151,22 @@ if ($json !== 0) {
 }
 
 // Output HTML page
-$PAGE->requires->yui_module('moodle-mod_abook-animate', 'M.mod_abook.animate.init', array($data['slidetype']));
+$PAGE->requires->yui_module('moodle-mod_abook-animate', 'M.mod_abook.animate.init', array($data['slidetype'], $edit));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($abook->name);
 echo "<div id='slidepanel' class='panel panel-default abframe'>";
 echo $html;
 echo "</div>";
+if ($edit) {
+	$slide->cmid = $cm->id;
+	$editoroptions = array('noclean'=>true, 'subdirs'=>true, 'maxfiles'=>-1, 'maxbytes'=>0, 'context'=>$context);
+	$pixoptions = array('maxfiles'=>1, 'subdirs'=>0, 'accepted_types'=>array('.jpg','.gif','.png'));
+	
+	$mform = prepare_slide_form($slide, $context, $editoroptions, $pixoptions, "{$CFG->wwwroow}/mod/abook/ajax_edit.php");
+	echo '<div id="formpanel" class="panel panel-default" style="display: none;">';
+	echo '<div class="panel-body">';
+	echo $mform->display();
+	echo '</div></div>';
+}
 echo $OUTPUT->footer();
