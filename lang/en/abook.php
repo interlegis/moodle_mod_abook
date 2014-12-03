@@ -38,10 +38,6 @@ $string['pluginname'] = 'Animated book';
 $string['pluginadministration'] = 'Animated book administration';
 
 $string['toc'] = 'Table of contents';
-$string['customtitles'] = 'Custom titles';
-$string['customtitles_help'] = 'Normally the slide title is displayed in the table of contents (TOC) AND as a heading above the content.
-
-If the custom titles checkbox is ticked, the slide title is NOT displayed as a heading above the content. A different title (perhaps longer than the slide title) may be entered as part of the content.';
 $string['slides'] = 'Slides';
 $string['slidetitle'] = 'Slide title';
 $string['content'] = 'Content';
@@ -66,3 +62,44 @@ $string['errorslide'] = 'Error reading slide of animated book.';
 $string['page-mod-abook-x'] = 'Any animated book module page';
 $string['subplugintype_abooktool'] = 'Animated book tool';
 $string['subplugintype_abooktool_plural'] = 'Animated book tools';
+
+// --------------------
+$_height_help = '<br/>Any valid <a href="http://www.w3.org/TR/css3-values/#lengths">CSS distance</a>. Examples: 600px 20em 30cm 20in';
+// --------------------
+
+$string['slidetype'] = 'Slide type';
+$string['frameheight'] = 'Frame height';
+$string['frameheight_help'] = 'The total slide height.'.$_height_help;
+$string['wallpaper'] = 'Wallpaper';
+$string['wallpaper_help'] = 'The background image for this slide';
+$string['contentanimation'] = 'Content animation';
+$string['boardpix'] = 'Blackboard image';
+$string['boardpix_help'] = 'Background image for content box';
+$string['boardheight'] = 'Board height';
+$string['boardheight_help'] = 'The total height of content box'.$_height_help;
+$string['content1'] = '2nd content';
+$string['contentanimation1'] = '2nd content animation';
+$string['boardpix1'] = '2nd blackboard image';
+$string['boardpix1_help'] = 'Background image for 2nd content box';
+$string['boardheight1'] = '2nd board height';
+$string['boardheight1_help'] = 'The total height of 2nd content box'.$_height_help;
+$string['content2'] = '3rd content';
+$string['contentanimation2'] = '3rd content animation';
+$string['boardpix2'] = '3rd blackboard image';
+$string['boardpix2_help'] = 'Background image for 3rd content box';
+$string['boardheight2'] = '3rd board height';
+$string['boardheight2_help'] = 'The total height of 3rd content box'.$_height_help;
+$string['content3'] = '4th content';
+$string['contentanimation3'] = '4th content animation';
+$string['boardpix3'] = '4th blackboard image';
+$string['boardpix3_help'] = 'Background image for 4th content box';
+$string['boardheight3'] = '4th board height';
+$string['boardheight3_help'] = 'The total height of 4th content box'.$_height_help;
+$string['footerpix'] = 'Footer image';
+$string['footerpix_help'] = 'The picture that compound the slide floor';
+$string['footerpos'] = 'Footer position';
+$string['footeranimation'] = 'Footer animation';
+$string['teacherpix'] = 'Teacher image';
+$string['teacherpix_help'] = 'The picture that represents the teacher character';
+$string['teacherpos'] = 'Teacher position';
+$string['teacheranimation'] = 'teacher animation';

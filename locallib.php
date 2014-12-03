@@ -118,99 +118,56 @@ function abook_get_toc($slides, $slide, $abook, $cm, $edit) {
     global $USER, $OUTPUT;
 
     $toc = '';
-    $first = 1;
 
     $context = context_module::instance($cm->id);
     $toc .= html_writer::start_tag('div', array('class' => 'abook_toc_none clearfix'));
-
-    if ($edit) { // Teacher's TOC
-        $toc .= html_writer::start_tag('ul');
-        $i = 0;
-        foreach ($slides as $sl) {
-            $i++;
-            $title = trim(format_string($sl->title, true, array('context'=>$context)));
-
-            if ($first) {
-                $toc .= html_writer::start_tag('li', array('class' => 'clearfix'));
-            } else {
-                $toc .= html_writer::end_tag('ul');
-                $toc .= html_writer::end_tag('li');
-                $toc .= html_writer::start_tag('li', array('class' => 'clearfix'));
-            }
-
-            if ($sl->hidden) {
-                $title = html_writer::tag('span', $title, array('class' => 'dimmed_text'));
-            }
-
-            if ($sl->id == $slide->id) {
-                $toc .= html_writer::tag('strong', $title);
-            } else {
-                $toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'slideid' => $sl->id)), $title, array('title' => s($title)));
-            }
-
-            $toc .= html_writer::start_tag('div', array('class' => 'action-list'));
-            if ($i != 1) {
-                $toc .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'slideid' => $sl->id, 'up' => '1', 'sesskey' => $USER->sesskey)),
-                                            $OUTPUT->pix_icon('t/up', get_string('up')), array('title' => get_string('up')));
-            }
-            if ($i != count($slides)) {
-                $toc .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'slideid' => $sl->id, 'up' => '0', 'sesskey' => $USER->sesskey)),
-                                            $OUTPUT->pix_icon('t/down', get_string('down')), array('title' => get_string('down')));
-            }
-            $toc .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'id' => $sl->id)),
-                                        $OUTPUT->pix_icon('t/edit', get_string('edit')), array('title' => get_string('edit')));
-            $toc .= html_writer::link(new moodle_url('delete.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
-                                        $OUTPUT->pix_icon('t/delete', get_string('delete')), array('title' => get_string('delete')));
-            if ($sl->hidden) {
-                $toc .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
-                                            $OUTPUT->pix_icon('t/show', get_string('show')), array('title' => get_string('show')));
-            } else {
-                $toc .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
-                                            $OUTPUT->pix_icon('t/hide', get_string('hide')), array('title' => get_string('hide')));
-            }
-            $toc .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'pagenum' => $sl->pagenum )),
-                                            $OUTPUT->pix_icon('add', get_string('addafter', 'mod_abook'), 'mod_abook'), array('title' => get_string('addafter', 'mod_abook')));
-            $toc .= html_writer::end_tag('div');
-
-            $toc .= html_writer::start_tag('ul');
-            $first = 0;
-        }
-
-        $toc .= html_writer::end_tag('ul');
-        $toc .= html_writer::end_tag('li');
-        $toc .= html_writer::end_tag('ul');
-
-    } else { // Normal students view
-        $toc .= html_writer::start_tag('ul');
-        foreach ($slides as $sl) {
-            $title = trim(format_string($sl->title, true, array('context'=>$context)));
-            if (!$sl->hidden) {
-                if ($first) {
-                    $toc .= html_writer::start_tag('li', array('class' => 'clearfix'));
-                } else {
-                    $toc .= html_writer::end_tag('ul');
-                    $toc .= html_writer::end_tag('li');
-                    $toc .= html_writer::start_tag('li', array('class' => 'clearfix'));
-                }
-                
-                if ($sl->id == $slide->id) {
-                    $toc .= html_writer::tag('strong', $title);
-                } else {
-                    $toc .= html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'slideid' => $sl->id)), $title, array('title' => s($title)));
-                }
-
-                $toc .= html_writer::start_tag('ul');
-
-                $first = 0;
-            }
-        }
-
-        $toc .= html_writer::end_tag('ul');
-        $toc .= html_writer::end_tag('li');
-        $toc .= html_writer::end_tag('ul');
-
+    $toc .= html_writer::start_tag('ul');
+    
+    $i = 0;
+    
+    foreach ($slides as $sl) {
+    	$i++;
+    	$title = trim(format_string($sl->title, true, array('context'=>$context)));
+    	$liclass = 'clearfix';
+    	if ($sl->id == $slide->id) {
+    		$liclass .= ' abook_toc_selected';
+    	}    	 
+    	$title = html_writer::link(new moodle_url('view.php', array('id' => $cm->id, 'slideid' => $sl->id)), $title, array('title' => s($title)));
+    	
+    	if ($edit) { // Teacher's TOC specific items
+    		$actions = html_writer::start_tag('div', array('class' => 'action-list'));
+    		if ($i != 1) {
+    			$actions .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'slideid' => $sl->id, 'up' => '1', 'sesskey' => $USER->sesskey)),
+    					$OUTPUT->pix_icon('t/up', get_string('up')), array('title' => get_string('up')));
+    		}
+    		if ($i != count($slides)) {
+    			$actions .= html_writer::link(new moodle_url('move.php', array('id' => $cm->id, 'slideid' => $sl->id, 'up' => '0', 'sesskey' => $USER->sesskey)),
+    					$OUTPUT->pix_icon('t/down', get_string('down')), array('title' => get_string('down')));
+    		}
+    		$actions .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'id' => $sl->id)),
+    				$OUTPUT->pix_icon('t/edit', get_string('edit')), array('title' => get_string('edit')));
+    		$actions .= html_writer::link(new moodle_url('delete.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
+    				$OUTPUT->pix_icon('t/delete', get_string('delete')), array('title' => get_string('delete')));
+    		if ($sl->hidden) {
+    			$actions .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
+    					$OUTPUT->pix_icon('t/show', get_string('show')), array('title' => get_string('show')));
+    		} else {
+    			$actions .= html_writer::link(new moodle_url('show.php', array('id' => $cm->id, 'slideid' => $sl->id, 'sesskey' => $USER->sesskey)),
+    					$OUTPUT->pix_icon('t/hide', get_string('hide')), array('title' => get_string('hide')));
+    		}
+    		$actions .= html_writer::link(new moodle_url('edit.php', array('cmid' => $cm->id, 'pagenum' => $sl->pagenum )),
+    				$OUTPUT->pix_icon('add', get_string('addafter', 'mod_abook'), 'mod_abook'), array('title' => get_string('addafter', 'mod_abook')));
+    		$actions .= html_writer::end_tag('div');
+    		
+    		$toc .= html_writer::tag('li', $title.$actions, array('class'=>$liclass));
+    	} else {
+    		if (!$sl->hidden) { // Show only if visible
+    			$toc .= html_writer::tag('li', $title, array('class'=>$liclass));
+    		}
+    	}
     }
-
+    
+	$toc .= html_writer::end_tag('ul');
     $toc .= html_writer::end_tag('div');
 
     $toc = str_replace('<ul></ul>', '', $toc); // Cleanup of invalid structures.
@@ -227,21 +184,26 @@ function abook_get_toc($slides, $slide, $abook, $cm, $edit) {
  * 
  */
 
-function get_pix_url($context, $slide, $area) {
+function get_pix_url($context, $slide, $filearea) {
+	global $OUTPUT;
+	
+	if (!array_key_exists($filearea, abook_get_file_areas())) {
+		return ''; # No default
+	}
 	
 	$fs = get_file_storage();
 	
-	if ($files = $fs->get_area_files($context->id, 'mod_abook', $area, $slide->id, "timemodified", false)) {
+	if ($files = $fs->get_area_files($context->id, 'mod_abook', $filearea, $slide->id, "timemodified", false)) {
 		foreach ($files as $file) {
-			$url = moodle_url::make_pluginfile_url($context->id, 'mod_abook', $area, $slide->id, $file->get_filepath(), $file->get_filename());
+			$url = moodle_url::make_pluginfile_url($context->id, 'mod_abook', $filearea, $slide->id, $file->get_filepath(), $file->get_filename());
 			return $url;
 		}
 	}
 	
-	if ($area == 'boardpix') {
-		return ''; # No default for boardpix
+	if (in_array($filearea, array('wallpaper', 'footerpix', 'teacherpix'))) {
+		return $OUTPUT->pix_url($filearea, 'mod_abook');
 	}
-	return "{$CFG->wwwroot}/mod/abook/pix/$area.png";
+	return ''; # No default
 }
 
 /**

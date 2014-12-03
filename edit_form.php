@@ -52,48 +52,72 @@ class abook_slide_edit_form extends moodleform {
             $mform->addElement('header', 'general', get_string('addafter', 'mod_abook'));
         }
 
+        $mform->addElement('select', 'slidetype', get_string('slidetype', 'mod_abook'), slide_types());
+        $mform->setType('slidetype', PARAM_RAW);
+        $mform->addRule('slidetype', get_string('required'), 'required', null, 'client');
+        
+        $mform->addElement('text', 'frameheight', get_string('frameheight', 'mod_abook'), array('size'=>'10'));
+        $mform->setType('frameheight', PARAM_RAW);
+        $mform->addHelpButton('frameheight', 'frameheight', 'mod_abook');
+        
+        $mform->addElement('filemanager', 'wallpaper_filemanager', get_string('wallpaper', 'mod_abook'), null, $pixoptions);
+        $mform->addHelpButton('wallpaper_filemanager', 'wallpaper', 'mod_abook');
+
         $mform->addElement('text', 'title', get_string('slidetitle', 'mod_abook'), array('size'=>'30'));
         $mform->setType('title', PARAM_RAW);
         $mform->addRule('title', null, 'required', null, 'client');
 
         $mform->addElement('editor', 'content_editor', get_string('content', 'mod_abook'), null, $options);
         $mform->setType('content_editor', PARAM_RAW);
-        $mform->addRule('content_editor', get_string('required'), 'required', null, 'client');
 
+        $mform->addElement('select', 'contentanimation', get_string('contentanimation', 'mod_abook'), $anmtopts);
+        $mform->setType('contentanimation', PARAM_RAW);
+
+        $mform->addElement('filemanager', 'boardpix_filemanager', get_string('boardpix', 'mod_abook'), null, $pixoptions);
+        $mform->addHelpButton('boardpix_filemanager', 'boardpix', 'mod_abook');
+        
+        $mform->addElement('text', 'boardheight', get_string('boardheight', 'mod_abook'), array('size'=>'30'));
+        $mform->setType('boardheight', PARAM_RAW);
+        $mform->addHelpButton('boardheight', 'boardheight', 'mod_abook');
+        
         $mform->addElement('editor', 'content1_editor', get_string('content1', 'mod_abook'), null, $options);
         $mform->setType('content1_editor', PARAM_RAW);
+        
+        $mform->addElement('select', 'contentanimation1', get_string('contentanimation1', 'mod_abook'), $anmtopts);
+        $mform->setType('contentanimation1', PARAM_RAW);
+        
+        $mform->addElement('filemanager', 'boardpix1_filemanager', get_string('boardpix1', 'mod_abook'), null, $pixoptions);
+        $mform->addHelpButton('boardpix1_filemanager', 'boardpix1', 'mod_abook');
+        
+        $mform->addElement('text', 'boardheight1', get_string('boardheight1', 'mod_abook'), array('size'=>'30'));
+        $mform->setType('boardheight1', PARAM_RAW);
+        $mform->addHelpButton('boardheight1', 'boardheight1', 'mod_abook');
 
         $mform->addElement('editor', 'content2_editor', get_string('content2', 'mod_abook'), null, $options);
         $mform->setType('content2_editor', PARAM_RAW);
+
+        $mform->addElement('select', 'contentanimation2', get_string('contentanimation2', 'mod_abook'), $anmtopts);
+        $mform->setType('contentanimation2', PARAM_RAW);
+        
+        $mform->addElement('filemanager', 'boardpix2_filemanager', get_string('boardpix2', 'mod_abook'), null, $pixoptions);
+        $mform->addHelpButton('boardpix2_filemanager', 'boardpix2', 'mod_abook');
+        
+        $mform->addElement('text', 'boardheight2', get_string('boardheight2', 'mod_abook'), array('size'=>'30'));
+        $mform->setType('boardheight2', PARAM_RAW);
+        $mform->addHelpButton('boardheight2', 'boardheight2', 'mod_abook');
         
         $mform->addElement('editor', 'content3_editor', get_string('content3', 'mod_abook'), null, $options);
         $mform->setType('content3_editor', PARAM_RAW);
+
+        $mform->addElement('select', 'contentanimation3', get_string('contentanimation3', 'mod_abook'), $anmtopts);
+        $mform->setType('contentanimation3', PARAM_RAW);
         
-        $mform->addElement('select', 'contentanimation', get_string('contentanimation', 'mod_abook'), $anmtopts);
-        $mform->setType('contentanimation', PARAM_RAW);
-        $mform->addRule('contentanimation', get_string('required'), 'required', null, 'client');
+        $mform->addElement('filemanager', 'boardpix3_filemanager', get_string('boardpix3', 'mod_abook'), null, $pixoptions);
+        $mform->addHelpButton('boardpix3_filemanager', 'boardpix3', 'mod_abook');
         
-        $mform->addElement('select', 'slidetype', get_string('slidetype', 'mod_abook'), slide_types());
-        $mform->setType('slidetype', PARAM_RAW);
-        $mform->addRule('slidetype', get_string('required'), 'required', null, 'client');
-        
-        $mform->addElement('text', 'frameheight', get_string('frameheight', 'mod_abook'), array('size'=>'10'));
-        $mform->setType('frameheight', PARAM_INTEGER);
-        $mform->addRule('frameheight', null, 'required', null, 'client');
-                
-        $mform->addElement('filemanager', 'wallpaper_filemanager', get_string('wallpaper', 'mod_abook'), null, $pixoptions);
-		$mform->addHelpButton('wallpaper_filemanager', 'wallpaper', 'mod_abook');
-		
-        $mform->addElement('filemanager', 'boardpix_filemanager', get_string('boardpix', 'mod_abook'), null, $pixoptions);
-		$mform->addHelpButton('boardpix_filemanager', 'boardpix', 'mod_abook');
-		
-        $mform->addElement('text', 'boardheight', get_string('boardheight', 'mod_abook'), array('size'=>'10'));
-        $mform->setType('boardheight', PARAM_INTEGER);
-        $mform->addRule('boardheight', null, 'required', null, 'client');
-        
-        $mform->addElement('select', 'boardanimation', get_string('boardanimation', 'mod_abook'), $anmtopts);
-        $mform->setType('boardanimation', PARAM_RAW);
-        $mform->addRule('boardanimation', get_string('required'), 'required', null, 'client');
+        $mform->addElement('text', 'boardheight3', get_string('boardheight3', 'mod_abook'), array('size'=>'30'));
+        $mform->setType('boardheight3', PARAM_RAW);
+        $mform->addHelpButton('boardheight3', 'boardheight3', 'mod_abook');
         
         $mform->addElement('filemanager', 'footerpix_filemanager', get_string('footerpix', 'mod_abook'), null, $pixoptions);
 		$mform->addHelpButton('footerpix_filemanager', 'footerpix', 'mod_abook');
@@ -104,7 +128,6 @@ class abook_slide_edit_form extends moodleform {
 
 		$mform->addElement('select', 'footeranimation', get_string('footeranimation', 'mod_abook'), $anmtopts);
 		$mform->setType('footeranimation', PARAM_RAW);
-		$mform->addRule('footeranimation', get_string('required'), 'required', null, 'client');
 
 		$mform->addElement('filemanager', 'teacherpix_filemanager', get_string('teacherpix', 'mod_abook'), null, $pixoptions);
 		$mform->addHelpButton('teacherpix_filemanager', 'teacherpix', 'mod_abook');
@@ -115,8 +138,6 @@ class abook_slide_edit_form extends moodleform {
 		
 		$mform->addElement('select', 'teacheranimation', get_string('teacheranimation', 'mod_abook'), $anmtopts);
 		$mform->setType('teacheranimation', PARAM_RAW);
-		$mform->addRule('teacheranimation', get_string('required'), 'required', null, 'client');
-		
 		
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -133,5 +154,3 @@ class abook_slide_edit_form extends moodleform {
         $this->set_data($slide);
     }
 }
-
-

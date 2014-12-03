@@ -3,27 +3,28 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
   M.mod_abook.animate = {
     init: function(slidetype) {
     	var lastrequest = '#';
+
+    	window.onpopstate = function(e){
+    	    if(e.state){
+    	    	document.title = e.state.pageTitle;
+    	    	$('html').html(e.state.html);
+    	    } else {
+    	    	window.location.href = e.currentTarget.location.href;
+    	    }
+    	};
+    	
     	adjustnavbar();
+    	
     	function adjustnavbar() {
-//    		$("#prevbutton, #nextbutton").each(function() {
-//    			var url = $(this).attr("href");
-//    			if (url.indexOf('?') > -1) {
-//    				url = url + '&';
-//    			} else {
-//    				url = url + '?';
-//    			}
-//    			$(this).attr("href", url+'json=1')
-//    		});
-    		
 			$("#prevbutton, #nextbutton").click(function() {
 				var url = $(this).attr("href");
 				lastrequest = url;
-				$.get(url, {'json': 1}, showslide).fail(fail);
+				$.get(url, {'json': 1}, showslide).done(sethistory).fail(fail);
 				return false;
-			});	    	
+			});
     	}
     	
-    	function fail() {
+    	function fail() { 
     		if (lastrequest != '#') {
     			// Try redirect instead ajax
     			window.location.href = lastrequest;
@@ -43,41 +44,51 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     		if ($.type(data) == "string") {
     			data = $.parseJSON(data);
     		}
-    		
+
+    		document.title = data.pagetitle;
+
     		if (data.slidetype != slidetype) {
+    			slidetype = data.slidetype;
     			$("#slidepanel").html(data.html);
     			adjustnavbar();
     			return;
     		}
-    
+    		
     		$("#slidenavbar").html(data.navigation);
     		adjustnavbar();
-    
-    		$("#wallpaper").css("background-image", 'url("'+data.wallpaper+'")');
-    		
-    		if (data.frameheight > 0) {
-    			$("#slidepanel").css("height", data.frameheight+"px");
-    		} else {
-    			$("#slidepanel").css("height", "");
-    		}
     		
     		$("#titlepanel").html(data.title);
+    
+    		$("#wallpaper").css("background-image", 'url("'+data.wallpaper+'")');
+    		$("#wallpaper").css("height", data.frameheight);
+
+	    	$("#content").css("background-image", 'url("'+data.boardpix+'")');
+	    	$("#content1").css("background-image", 'url("'+data.boardpix1+'")');
+	    	$("#content2").css("background-image", 'url("'+data.boardpix2+'")');
+	    	$("#content3").css("background-image", 'url("'+data.boardpix3+'")');
+	    	
+	    	$("#content").css("height", data.boardheight);
+	    	$("#content1").css("height", data.boardheight1);
+	    	$("#content2").css("height", data.boardheight2);
+	    	$("#content3").css("height", data.boardheight3);
+    		
     		$("#content").html(data.content);
     		$("#content1").html(data.content1);
 	    	$("#content2").html(data.content2);
 	    	$("#content3").html(data.content3);
     
-	    	$("#content, #content1, #content2, #content3").addClass(data.contentanimation).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-	    		$("#content, #content1,  #content2, #content3").removeClass(data.contentanimation);
+	    	$("#content").addClass(data.contentanimation).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+	    		$("#content").removeClass(data.contentanimation);
 	    	});
-    	
-	    	$("#content, #content1, #content2, #content3").css("background-image", 'url("'+data.boardpix+'")');
-    	
-	    	if (data.boardheight > 0) {
-	    		$("#content, #content1, #content2, #content3").css("height", data.boardheight+'px');
-	    	} else {
-	    		$("#content, #content1, #content2, #content3").css("height", "");
-	    	}
+	    	$("#content1").addClass(data.contentanimation1).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+	    		$("#content1").removeClass(data.contentanimation1);
+	    	});
+	    	$("#content2").addClass(data.contentanimation2).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+	    		$("#content2").removeClass(data.contentanimation2);
+	    	});
+	    	$("#content3").addClass(data.contentanimation3).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+	    		$("#content3").removeClass(data.contentanimation3);
+	    	});
 	    	
 	    	$("#teacherpanel").attr('class', 'abteacher ' + data.teacherpos);
 	    	    	
@@ -91,10 +102,17 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
 	    	$("#floorpix").attr('src', data.footerpix).attr('class', '').addClass(data.footeranimation)
 	    		.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
 	    			$("#floorpix").removeClass(data.footeranimation);
-	    	});			
+	    	});
     	}
     	
-    	
+    	function sethistory() {
+    		var html = $('html').html();
+    		var url = this.url.replace('?json=1', '').replace('&json=1', '');
+    		$(".abook_toc_none>ul>li").removeClass('abook_toc_selected');
+    		$(".abook_toc_none>ul>li>a[href$='"+url+"']").parent().addClass('abook_toc_selected')
+    		// This line shall be the last statement in the function
+    		window.history.pushState({"html": html, "pageTitle": document.title}, "", url);
+    	}
     }
   };
 }, '@VERSION@', {

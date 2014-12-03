@@ -45,10 +45,6 @@ function abook_add_instance($data, $mform) {
 
     $data->timecreated = time();
     $data->timemodified = $data->timecreated;
-    if (!isset($data->customtitles)) {
-        $data->customtitles = 0;
-    }
-
     return $DB->insert_record('abook', $data);
 }
 
@@ -64,9 +60,6 @@ function abook_update_instance($data, $mform) {
 
     $data->timemodified = time();
     $data->id = $data->instance;
-    if (!isset($data->customtitles)) {
-        $data->customtitles = 0;
-    }
 
     $DB->update_record('abook', $data);
 
@@ -288,9 +281,20 @@ function abook_extend_settings_navigation(settings_navigation $settingsnav, navi
  * @param object $context
  * @return array
  */
-function abook_get_file_areas($course, $cm, $context) {
-    $areas = array();
-    $areas['slide'] = get_string('slides', 'mod_abook');
+function abook_get_file_areas($course=null, $cm=null, $context=null) {
+    $areas = array(
+    	'content'    => get_string('content'   , 'mod_abook'),
+    	'content1'   => get_string('content1'  , 'mod_abook'),
+    	'content2'   => get_string('content2'  , 'mod_abook'),
+    	'content3'   => get_string('content3'  , 'mod_abook'),
+    	'wallpaper'  => get_string('wallpaper' , 'mod_abook'),
+    	'boardpix'   => get_string('boardpix'  , 'mod_abook'),
+    	'boardpix1'  => get_string('boardpix1' , 'mod_abook'),
+    	'boardpix2'  => get_string('boardpix2' , 'mod_abook'),
+    	'boardpix3'  => get_string('boardpix3' , 'mod_abook'),
+    	'footerpix'  => get_string('footerpix' , 'mod_abook'),
+    	'teacherpix' => get_string('teacherpix', 'mod_abook')
+    );
     return $areas;
 }
 
@@ -316,7 +320,7 @@ function abook_get_file_info($browser, $areas, $course, $cm, $context, $filearea
         return null;
     }
 
-    if ($filearea !== 'slide') {
+    if (!array_key_exists($filearea, abook_get_file_areas())) {
         return null;
     }
 
@@ -364,7 +368,7 @@ function abook_pluginfile($course, $cm, $context, $filearea, $args, $forcedownlo
 
     require_course_login($course, true, $cm);
 
-    if (!in_array($filearea,array('content', 'content1', 'content2', 'content3', 'wallpaper', 'boardpix', 'footerpix', 'teacherpix'))) {
+    if (!array_key_exists($filearea, abook_get_file_areas())) {
         return false;
     }
 

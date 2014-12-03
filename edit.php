@@ -60,6 +60,9 @@ $slide = file_prepare_standard_editor($slide, 'content3', $options, $context, 'm
 $pixoptions = array('maxfiles'=>1, 'subdirs'=>0, 'accepted_types'=>array('.jpg','.gif','.png'));
 $slide = file_prepare_standard_filemanager($slide, 'wallpaper' , $pixoptions, $context, 'mod_abook', 'wallpaper' , $slide->id);
 $slide = file_prepare_standard_filemanager($slide, 'boardpix'  , $pixoptions, $context, 'mod_abook', 'boardpix'  , $slide->id);
+$slide = file_prepare_standard_filemanager($slide, 'boardpix1' , $pixoptions, $context, 'mod_abook', 'boardpix1' , $slide->id);
+$slide = file_prepare_standard_filemanager($slide, 'boardpix2' , $pixoptions, $context, 'mod_abook', 'boardpix2' , $slide->id);
+$slide = file_prepare_standard_filemanager($slide, 'boardpix3' , $pixoptions, $context, 'mod_abook', 'boardpix3' , $slide->id);
 $slide = file_prepare_standard_filemanager($slide, 'footerpix' , $pixoptions, $context, 'mod_abook', 'footerpix' , $slide->id);
 $slide = file_prepare_standard_filemanager($slide, 'teacherpix', $pixoptions, $context, 'mod_abook', 'teacherpix', $slide->id);
 
@@ -72,22 +75,23 @@ if ($mform->is_cancelled()) {
     } else {
         redirect("view.php?id=$cm->id&slideid=$slide->id");
     }
-
 } else if ($data = $mform->get_data()) {
-
     if (!$data->id) {
         // adding new slide
         $data->abookid        = $abook->id;
-        $data->hidden        = 0;
-        $data->timecreated   = time();
-        $data->timemodified  = time();
-        $data->importsrc     = '';
-        $data->content       = '';          // updated later
-        $data->content1      = '';          // updated later
-        $data->content2      = '';          // updated later
-        $data->content3      = '';          // updated later
-        $data->contentformat = FORMAT_HTML; // updated later
-
+        $data->hidden         = 0;
+        $data->timecreated    = time();
+        $data->timemodified   = time();
+        $data->importsrc      = '';
+        $data->content        = '';          // updated later
+        $data->content1       = '';          // updated later
+        $data->content2       = '';          // updated later
+        $data->content3       = '';          // updated later
+        $data->contentformat  = FORMAT_HTML; // updated later
+        $data->content1format = FORMAT_HTML; // updated later
+        $data->content2format = FORMAT_HTML; // updated later
+        $data->content3format = FORMAT_HTML; // updated later
+        
         // make room for new page
         $sql = "UPDATE {abook_slide}
                    SET pagenum = pagenum + 1
@@ -105,8 +109,12 @@ if ($mform->is_cancelled()) {
     $data = file_postupdate_standard_editor($data, 'content3', $options, $context, 'mod_abook', 'content3', $data->id);
     $data = file_postupdate_standard_filemanager($data, 'wallpaper' , $pixoptions, $context, 'mod_abook', 'wallpaper' , $data->id);
     $data = file_postupdate_standard_filemanager($data, 'boardpix'  , $pixoptions, $context, 'mod_abook', 'boardpix'  , $data->id);
+    $data = file_postupdate_standard_filemanager($data, 'boardpix1' , $pixoptions, $context, 'mod_abook', 'boardpix1' , $data->id);
+    $data = file_postupdate_standard_filemanager($data, 'boardpix2' , $pixoptions, $context, 'mod_abook', 'boardpix2' , $data->id);
+    $data = file_postupdate_standard_filemanager($data, 'boardpix3' , $pixoptions, $context, 'mod_abook', 'boardpix3' , $data->id);
     $data = file_postupdate_standard_filemanager($data, 'footerpix' , $pixoptions, $context, 'mod_abook', 'footerpix' , $data->id);
     $data = file_postupdate_standard_filemanager($data, 'teacherpix', $pixoptions, $context, 'mod_abook', 'teacherpix', $data->id);
+
     $DB->update_record('abook_slide', $data);
     $DB->set_field('abook', 'revision', $abook->revision+1, array('id'=>$abook->id));
     $slide = $DB->get_record('abook_slide', array('id' => $data->id));

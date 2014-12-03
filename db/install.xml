@@ -6,14 +6,14 @@
   <TABLES>
     <TABLE NAME="abook" COMMENT="Defines animated book">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="revision" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="id"                TYPE="int"  LENGTH="10"  NOTNULL="true"              SEQUENCE="true" />
+        <FIELD NAME="course"            TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="name"              TYPE="char" LENGTH="255" NOTNULL="true"              SEQUENCE="false"/>
+        <FIELD NAME="intro"             TYPE="text"              NOTNULL="false"             SEQUENCE="false"/>
+        <FIELD NAME="introformat"       TYPE="int"  LENGTH="4"   NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="revision"          TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated"       TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified"      TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -21,35 +21,43 @@
     </TABLE>
     <TABLE NAME="abook_slide" COMMENT="Defines animated book slides">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="abookid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="pagenum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="content1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="content2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="content3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="contentformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="content1format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="content2format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="content3format" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="slidetype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="contentanimation" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="fadeIn" SEQUENCE="false"/>
-        <FIELD NAME="hidden" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="frameheight" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="wallpaper" TYPE="char" NOTNULL="false" LENGTH="255" SEQUENCE="false"/>
-        <FIELD NAME="boardpix" TYPE="char" NOTNULL="false" LENGTH="255" SEQUENCE="false"/>
-        <FIELD NAME="boardheight" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="boardanimation" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="fadeIn" SEQUENCE="false"/>
-        <FIELD NAME="footerpix" TYPE="char" NOTNULL="false" LENGTH="255" SEQUENCE="false"/>
-        <FIELD NAME="footerpos" TYPE="char" LENGTH="1" NOTNULL="true" DEFAULT="r" SEQUENCE="false"/>
-        <FIELD NAME="footeranimation" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="fadeIn" SEQUENCE="false"/>
-        <FIELD NAME="teacherpix" TYPE="char" NOTNULL="false" LENGTH="255" SEQUENCE="false"/>
-        <FIELD NAME="teacherpos" TYPE="char" LENGTH="1" NOTNULL="true" DEFAULT="l" SEQUENCE="false"/>
-        <FIELD NAME="teacheranimation" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="fadeIn" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="importsrc" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="id"                TYPE="int"  LENGTH="10"  NOTNULL="true"                   SEQUENCE="true" />
+        <FIELD NAME="abookid"           TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="pagenum"           TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="hidden"            TYPE="int"  LENGTH="2"   NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="slidetype"         TYPE="char" LENGTH="50"  NOTNULL="true"                   SEQUENCE="false"/>
+        <FIELD NAME="frameheight"       TYPE="char" LENGTH="30"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="wallpaper"         TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="title"             TYPE="char" LENGTH="255" NOTNULL="true"                   SEQUENCE="false"/>
+        <FIELD NAME="content"           TYPE="text"              NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="content1"          TYPE="text"              NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="content2"          TYPE="text"              NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="content3"          TYPE="text"              NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="contentformat"     TYPE="int"  LENGTH="4"   NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="content1format"    TYPE="int"  LENGTH="4"   NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="content2format"    TYPE="int"  LENGTH="4"   NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="content3format"    TYPE="int"  LENGTH="4"   NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="contentanimation"  TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="contentanimation1" TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="contentanimation2" TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="contentanimation3" TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardpix"          TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardpix1"         TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardpix2"         TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardpix3"         TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardheight"       TYPE="char" LENGTH="30"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardheight1"      TYPE="char" LENGTH="30"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardheight2"      TYPE="char" LENGTH="30"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="boardheight3"      TYPE="char" LENGTH="30"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="footerpix"         TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="footerpos"         TYPE="char" LENGTH="1"   NOTNULL="true"  DEFAULT="r"      SEQUENCE="false"/>
+        <FIELD NAME="footeranimation"   TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="teacherpix"        TYPE="char" LENGTH="10"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="teacherpos"        TYPE="char" LENGTH="1"   NOTNULL="true"  DEFAULT="l"      SEQUENCE="false"/>
+        <FIELD NAME="teacheranimation"  TYPE="char" LENGTH="20"  NOTNULL="false"                  SEQUENCE="false"/>
+        <FIELD NAME="timecreated"       TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="timemodified"      TYPE="int"  LENGTH="10"  NOTNULL="true"  DEFAULT="0"      SEQUENCE="false"/>
+        <FIELD NAME="importsrc"         TYPE="char" LENGTH="255" NOTNULL="true"                   SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

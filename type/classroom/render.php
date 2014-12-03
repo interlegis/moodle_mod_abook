@@ -1,3 +1,10 @@
+<style type="text/css">
+	.abwallpaper {
+		background-image: url('<?php echo $OUTPUT->pix_url('wallpaper', 'mod_abook'); ?>');
+		min-height: 400px;
+	}
+</style>
+
 <div class="panel-heading">
 	<h3 id="titlepanel" class="panel-title"><?php echo $data['title']; ?></h3>
 </div>
@@ -8,10 +15,10 @@
 		</div>
 	</div>
 	<div id="floorpanel" class="abfloor <?php echo $data['footerpos'].' '.$data['footeranimation']; ?>">
-		<img id="floorpix" src="<?php echo $data['footerpix']; ?>"/>
+		<img id="floorpix" class="img-responsive" src="<?php echo $data['footerpix']; ?>"/>
 	</div>
 	<div id="teacherpanel" class="abteacher <?php echo $data['teacherpos'].' '.$data['teacheranimation']; ?>">
-		<img id="teacherpix" src="<?php echo $data['teacherpix']; ?>"/>
+		<img id="teacherpix" class="img-responsive" src="<?php echo $data['teacherpix']; ?>"/>
 	</div>
 </div>
 <div id="slidenavbar" class="panel-footer abfooter">
