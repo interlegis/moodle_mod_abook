@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define all the restore steps that will be used by the restore_book_activity_task
+ * Define all the restore steps that will be used by the restore_abook_activity_task
  *
- * @package    mod_book
+ * @package    mod_abook
  * @copyright  2010 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,58 +25,58 @@
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Structure step to restore one book activity
+ * Structure step to restore one abook activity
  */
-class restore_book_activity_structure_step extends restore_activity_structure_step {
+class restore_abook_activity_structure_step extends restore_activity_structure_step {
 
     protected function define_structure() {
 
         $paths = array();
 
-        $paths[] = new restore_path_element('book', '/activity/book');
-        $paths[] = new restore_path_element('book_chapter', '/activity/book/chapters/chapter');
+        $paths[] = new restore_path_element('abook', '/activity/abook');
+        $paths[] = new restore_path_element('abook_slide', '/activity/abook/slides/slide');
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
 
     /**
-     * Process book tag information
+     * Process abook tag information
      * @param array $data information
      */
-    protected function process_book($data) {
+    protected function process_abook($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        $newitemid = $DB->insert_record('book', $data);
+        $newitemid = $DB->insert_record('abook', $data);
         $this->apply_activity_instance($newitemid);
     }
 
     /**
-     * Process chapter tag information
+     * Process slide tag information
      * @param array $data information
      */
-    protected function process_book_chapter($data) {
+    protected function process_abook_slide($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
         $data->course = $this->get_courseid();
 
-        $data->bookid = $this->get_new_parentid('book');
+        $data->abookid = $this->get_new_parentid('abook');
 
-        $newitemid = $DB->insert_record('book_chapters', $data);
-        $this->set_mapping('book_chapter', $oldid, $newitemid, true);
+        $newitemid = $DB->insert_record('abook_slides', $data);
+        $this->set_mapping('abook_slide', $oldid, $newitemid, true);
     }
 
     protected function after_execute() {
         global $DB;
 
-        // Add book related files
-        $this->add_related_files('mod_book', 'intro', null);
-        $this->add_related_files('mod_book', 'chapter', 'book_chapter');
+        // Add abook related files
+        $this->add_related_files('mod_abook', 'intro', null);
+        $this->add_related_files('mod_abook', 'slide', 'abook_slide');
     }
 }

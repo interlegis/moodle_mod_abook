@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define all the backup steps that will be used by the backup_book_activity_task
+ * Define all the backup steps that will be used by the backup_abook_activity_task
  *
- * @package    mod_book
+ * @package    mod_abook
  * @copyright  2010 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,29 +25,29 @@
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * Structure step to backup one book activity
+ * Structure step to backup one abook activity
  */
-class backup_book_activity_structure_step extends backup_activity_structure_step {
+class backup_abook_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
 
         // Define each element separated
-        $book     = new backup_nested_element('book', array('id'), array('name', 'intro', 'introformat', 'numbering', 'customtitles', 'timecreated', 'timemodified'));
-        $chapters = new backup_nested_element('chapters');
-        $chapter  = new backup_nested_element('chapter', array('id'), array('pagenum', 'subchapter', 'title', 'content', 'contentformat', 'hidden', 'timemcreated', 'timemodified', 'importsrc',));
+        $abook     = new backup_nested_element('abook', array('id'), array('name', 'intro', 'introformat', 'numbering', 'customtitles', 'timecreated', 'timemodified'));
+        $slides = new backup_nested_element('slides');
+        $slide  = new backup_nested_element('slide', array('id'), array('pagenum', 'subchapter', 'title', 'content', 'contentformat', 'hidden', 'timemcreated', 'timemodified', 'importsrc',));
 
-        $book->add_child($chapters);
-        $chapters->add_child($chapter);
+        $abook->add_child($slides);
+        $slides->add_child($slide);
 
         // Define sources
-        $book->set_source_table('book', array('id' => backup::VAR_ACTIVITYID));
-        $chapter->set_source_table('book_chapters', array('bookid' => backup::VAR_PARENTID));
+        $abook->set_source_table('abook', array('id' => backup::VAR_ACTIVITYID));
+        $slide->set_source_table('abook_slide', array('abookid' => backup::VAR_PARENTID));
 
         // Define file annotations
-        $book->annotate_files('mod_book', 'intro', null); // This file area hasn't itemid
-        $chapter->annotate_files('mod_book', 'chapter', 'id');
+        $abook->annotate_files('mod_abook', 'intro', null); // This file area hasn't itemid
+        $slide->annotate_files('mod_abook', 'slide', 'id');
 
-        // Return the root element (book), wrapped into standard activity structure
-        return $this->prepare_activity_structure($book);
+        // Return the root element (abook), wrapped into standard activity structure
+        return $this->prepare_activity_structure($abook);
     }
 }
