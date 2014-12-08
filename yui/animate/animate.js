@@ -1,8 +1,10 @@
 YUI.add('moodle-mod_abook-animate', function(Y) {
   M.mod_abook = M.mod_abook || {};
   M.mod_abook.animate = {
-    init: function(slidetype, editing) {
+    init: function(slidetype, editing, thisslide) {
     	var lastrequest = '#';
+    	var slidepool = {};
+    	slidepool[thisslide.slideid] = thisslide;
     	
     	adjustnavbar();
     	mod_editing()
@@ -22,7 +24,15 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     		}
 			$("#prevbutton, #nextbutton").click(function() {
 				var url = $(this).attr("href");
+				var slideid = parseInt(url.replace(/.*slideid=/,'').replace(/=.*/,''));
+				
 				lastrequest = url;
+				
+				if (slideid in slidepool) { // Show cached slide
+					showslide(slidepool[slideid], 'success');
+					return false;
+				}
+				
 				$.get(url, {'json': 1}, showslide).done(sethistory).fail(fail);
 				return false;
 			});
@@ -50,7 +60,10 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     		}
     		
     		slideid = data.slideid;
-    		pagenum = data.pagenum;
+    		
+    		if (!(slideid in slidepool)) {
+    			slidepool[slideid] = data;
+    		}
 
     		document.title = data.pagetitle;
 
@@ -149,6 +162,7 @@ YUI.add('moodle-mod_abook-animate', function(Y) {
     		// This line shall be the last statement in the function
     		window.history.pushState({"html": html, "pageTitle": document.title}, "", url);
     	}
+    	
     }
   };
 }, '@VERSION@', {

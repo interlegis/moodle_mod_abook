@@ -142,16 +142,17 @@ ob_end_clean();
 // Animated book end of display HTML code
 // =====================================================
 
+$data['html'] = $html;
+
 if ($json !== 0) {
 	// Mount a json response
-	$data['html'] = $html;
 	header('Content-Type: application/json');
 	echo json_encode($data);
 	return;
 }
 
 // Output HTML page
-$PAGE->requires->yui_module('moodle-mod_abook-animate', 'M.mod_abook.animate.init', array($data['slidetype'], $edit));
+$PAGE->requires->yui_module('moodle-mod_abook-animate', 'M.mod_abook.animate.init', array($data['slidetype'], $edit, $data));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($abook->name);

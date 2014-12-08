@@ -350,6 +350,8 @@ function slide_to_array($abook, $slide, $context, $fmtoptions, $cm, $edit) {
 	}
 	
 	$data = array(
+			'slideid'           => $slide->id,
+			'pagenum'           => $slide->pagenum,
 			'pagetitle'         => $abook->name . ": " . $slide->title,
 			'navigation'        => $slnavigation,
 			'slidetype'         => $slide->slidetype,
